@@ -1,20 +1,23 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
+<ion-header>
+
+	<ion-toolbar color="primary">
+		<ion-title>
+			Ionic 4 template
+		</ion-title>
+	</ion-toolbar>
+
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content padding>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <app-tinder-ui [cards]="cards" (choiceMade)="logChoice($event)"></app-tinder-ui>
+
 </ion-content>
+
+<ion-footer>
+
+  <ion-toolbar>
+    <ion-button expand="full" (click)="loadTinderCards()">Load Tinder Cards!</ion-button>
+  </ion-toolbar>
+
+</ion-footer>
