@@ -45,4 +45,9 @@ export class HomePage {
     ]
   };
 
+  logChoice(e){
+    console.log(e.payload);
+    console.log(e.choice);
+  }
+
 }

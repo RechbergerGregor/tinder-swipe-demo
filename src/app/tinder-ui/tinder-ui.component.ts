@@ -16,9 +16,10 @@ export class TinderUiComponent{
   @Output() choiceMade = new EventEmitter();
   @ViewChildren('tinderCard') tinderCards: QueryList<ElementRef>;
 
-  tinderCardsArray: Array<ElementRef>;
+  recipeCardsArray: Array<ElementRef>;
   
-
+  hookVisible : boolean = false;
+  crossVisible : boolean = false;
   moveOutWidth: number; // value in pixels that a card needs to travel to dissapear from screen
   shiftRequired: boolean; // state variable that indicates we need to remove the top card of the stack
   transitionInProgress: boolean; // state variable that indicates currently there is transition on-going
@@ -26,18 +27,35 @@ export class TinderUiComponent{
   constructor(private renderer: Renderer2) { // we imported Renderer to be able to alter style's of elements safely
   }
 
-  userClickedButton(event, heart) {
-    console.log("Test")
+  userClickedButton(event, choice) {
     event.preventDefault();
     if (!this.cards.length) return false;
 
-    if (heart) {
-      this.tinderCardsArray[0].nativeElement.style.transform = 'translate(' + this.moveOutWidth + 'px, -100px) rotate(-30deg)';
-    } else {
-      this.tinderCardsArray[0].nativeElement.style.transform = 'translate(-' + this.moveOutWidth + 'px, -100px) rotate(30deg)';
+    if (choice) {
+      this.recipeCardsArray[0].nativeElement.style.transform = 'translate(' + this.moveOutWidth + 'px, -100px) rotate(-30deg)';
+      this.toggleChoiceIndicator(true,false);
+    } 
+  	else {
+      this.recipeCardsArray[0].nativeElement.style.transform = 'translate(-' + this.moveOutWidth + 'px, -100px) rotate(30deg)';
+      this.toggleChoiceIndicator(false,true);
     };
     this.shiftRequired = true;
     this.transitionInProgress = true;
+    this.emitChoice(choice, this.cards[0]);
+
+  };
+
+
+  toggleChoiceIndicator(cross, heart) {
+    this.crossVisible = cross;
+    this.hookVisible = heart;
+  };
+
+  emitChoice(heart, card) {
+    this.choiceMade.emit({
+      choice: heart,
+      payload: card
+    })
   };
 
   handleShift() {
@@ -56,14 +74,14 @@ export class TinderUiComponent{
       this.handleShift();
     }
 
-    this.renderer.addClass(this.tinderCardsArray[0].nativeElement, 'moving');
+    this.renderer.addClass(this.recipeCardsArray[0].nativeElement, 'moving');
 
 
     let xMulti = event.deltaX * 0.03;
     let yMulti = event.deltaY / 80;
     let rotate = xMulti * yMulti;
 
-    this.renderer.setStyle(this.tinderCardsArray[0].nativeElement, 'transform', 'translate(' + event.deltaX + 'px, ' + event.deltaY + 'px) rotate(' + rotate + 'deg)');
+    this.renderer.setStyle(this.recipeCardsArray[0].nativeElement, 'transform', 'translate(' + event.deltaX + 'px, ' + event.deltaY + 'px) rotate(' + rotate + 'deg)');
 
     this.shiftRequired = true;
 
@@ -73,12 +91,12 @@ export class TinderUiComponent{
 
     if (!this.cards.length) return;
 
-    this.renderer.removeClass(this.tinderCardsArray[0].nativeElement, 'moving');
+    this.renderer.removeClass(this.recipeCardsArray[0].nativeElement, 'moving');
 
     let keep = Math.abs(event.deltaX) < 80 || Math.abs(event.velocityX) < 0.5;
     if (keep) {
 
-      this.renderer.setStyle(this.tinderCardsArray[0].nativeElement, 'transform', '');
+      this.renderer.setStyle(this.recipeCardsArray[0].nativeElement, 'transform', '');
       this.shiftRequired = false;
 
     } else {
@@ -91,28 +109,28 @@ export class TinderUiComponent{
       let yMulti = event.deltaY / 80;
       let rotate = xMulti * yMulti;
 
-      this.renderer.setStyle(this.tinderCardsArray[0].nativeElement, 'transform', 'translate(' + toX + 'px, ' + (toY + event.deltaY) + 'px) rotate(' + rotate + 'deg)');
+      this.renderer.setStyle(this.recipeCardsArray[0].nativeElement, 'transform', 'translate(' + toX + 'px, ' + (toY + event.deltaY) + 'px) rotate(' + rotate + 'deg)');
 
       this.shiftRequired = true;
 
       this.emitChoice(!!(event.deltaX > 0), this.cards[0]);
+
+      if(!!(event.deltaX > 0))
+      {
+        this.toggleChoiceIndicator(true,false);
+      }
+      else{
+        this.toggleChoiceIndicator(false,true);
+      }
     }
     this.transitionInProgress = true;
   };
 
-  emitChoice(heart, card) {
-    this.choiceMade.emit({
-      choice: heart,
-      payload: card
-    })
-  };
-
-
   ngAfterViewInit() {
     this.moveOutWidth = document.documentElement.clientWidth * 1.5;
-    this.tinderCardsArray = this.tinderCards.toArray();
+    this.recipeCardsArray = this.tinderCards.toArray();
     this.tinderCards.changes.subscribe(()=>{
-      this.tinderCardsArray = this.tinderCards.toArray();
+      this.recipeCardsArray = this.tinderCards.toArray();
     })
   };
 }
