@@ -22,39 +22,32 @@ export class TinderUiComponent{
   moveOutWidth: number; // value in pixels that a card needs to travel to dissapear from screen
   shiftRequired: boolean; // state variable that indicates we need to remove the top card of the stack
   transitionInProgress: boolean; // state variable that indicates currently there is transition on-going
-  heartVisible: boolean;
-  crossVisible: boolean;
 
   constructor(private renderer: Renderer2) { // we imported Renderer to be able to alter style's of elements safely
   }
 
   userClickedButton(event, heart) {
+    console.log("Test")
     event.preventDefault();
     if (!this.cards.length) return false;
+
     if (heart) {
       this.tinderCardsArray[0].nativeElement.style.transform = 'translate(' + this.moveOutWidth + 'px, -100px) rotate(-30deg)';
-      this.toggleChoiceIndicator(false,true);
     } else {
       this.tinderCardsArray[0].nativeElement.style.transform = 'translate(-' + this.moveOutWidth + 'px, -100px) rotate(30deg)';
-      this.toggleChoiceIndicator(true,false);
     };
     this.shiftRequired = true;
     this.transitionInProgress = true;
   };
 
-  toggleChoiceIndicator(cross, heart) {
-    this.crossVisible = cross;
-    this.heartVisible = heart;
-  };
-
   handleShift() {
     this.transitionInProgress = false;
-    this.toggleChoiceIndicator(false,false)
     if (this.shiftRequired) {
       this.shiftRequired = false;
       this.cards.shift();
     };
   };
+
   handlePan(event) {
 
     if (event.deltaX === 0 || (event.center.x === 0 && event.center.y === 0) || !this.cards.length) return;
@@ -65,8 +58,6 @@ export class TinderUiComponent{
 
     this.renderer.addClass(this.tinderCardsArray[0].nativeElement, 'moving');
 
-    if (event.deltaX > 0) { this.toggleChoiceIndicator(false,true) }
-    if (event.deltaX < 0) { this.toggleChoiceIndicator(true,false) }
 
     let xMulti = event.deltaX * 0.03;
     let yMulti = event.deltaY / 80;
@@ -79,8 +70,6 @@ export class TinderUiComponent{
   };
 
   handlePanEnd(event) {
-
-    this.toggleChoiceIndicator(false,false);
 
     if (!this.cards.length) return;
 
@@ -120,6 +109,7 @@ export class TinderUiComponent{
 
 
   ngAfterViewInit() {
+    this.moveOutWidth = document.documentElement.clientWidth * 1.5;
     this.tinderCardsArray = this.tinderCards.toArray();
     this.tinderCards.changes.subscribe(()=>{
       this.tinderCardsArray = this.tinderCards.toArray();

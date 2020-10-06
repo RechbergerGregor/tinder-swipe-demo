@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule, HammerModule } from '@angular/platform-browser';
+import { Injectable, NgModule } from '@angular/core';
+import { BrowserModule, HammerGestureConfig, HammerModule, HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -8,6 +8,17 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+import { LocationStrategy, PathLocationStrategy } from '@angular/common';
+
+@Injectable()
+export class HammerConfig extends HammerGestureConfig {
+  overrides = <any> {
+      // I will only use the swap gesture so 
+      // I will deactivate the others to avoid overlaps
+      'pinch': { enable: false },
+      'rotate': { enable: false }
+  }
+}
 
 @NgModule({
   declarations: [AppComponent],
@@ -16,7 +27,11 @@ import { AppRoutingModule } from './app-routing.module';
   providers: [
     StatusBar,
     SplashScreen,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    {provide: LocationStrategy, useClass: PathLocationStrategy},{
+    provide: HAMMER_GESTURE_CONFIG,
+    useClass: HammerConfig
+  }
   ],
   bootstrap: [AppComponent]
 })
