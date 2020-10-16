@@ -43,6 +43,7 @@ export class TinderUiComponent{
     this.transitionInProgress = true;
     this.emitChoice(choice, this.cards[0]);
 
+    setTimeout( () => { this.toggleChoiceIndicator(false,false) }, 500 );
   };
 
 
